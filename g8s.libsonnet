@@ -289,7 +289,7 @@ local tasks = {
   deploy:: function(namespace, name, repoUrl, branch, serviceAccountName) { spec: { 
     # Template parameters definitions. Available in the whole Template
     # with $(tt.params) and bound with event listener bindings
-    params: [{ name: 'imageVersion', default: ':%s' % [branch] }],
+    params: [{ name: 'imageVersion', default: '' }],
     # Templates for {TaskRun, PiplineRun}s to create when triggered
     resourcetemplates: [{ 
       apiVersion: 'tekton.dev/v1beta1',
