@@ -69,7 +69,7 @@ local gitInput(name, url, revision) = {
   }
 };
 
-local v0_6_0 {
+local v0_6_0 = {
   github:: {
     interceptors:: function(branch, apiKeySecretName, apiKeySecretKey = 'SECRET', eventTypes = ['push']) [{
       ref: {
@@ -122,7 +122,7 @@ local v0_6_0 {
       }]
     }]
   }
-}
+};
 
 local github = {
   interceptors:: function(branch, apiKeySecretName, apiKeySecretKey = 'SECRET', eventTypes = ['push']) [{
