@@ -378,7 +378,7 @@ local tasks = {
     local gitImage = 'alpine/git',
     # Template parameters definitions. Available in the whole template
     # with $(tt.params)
-    params: [{ name: 'imageVersion', default: ':%s' + branch }],
+    params: [{ name: 'imageVersion', default: ':%s' % [branch] }],
     # Templates for {TaskRun, PiplineRun}s to create when triggered
     resourcetemplates: [{ 
       apiVersion: 'tekton.dev/v1beta1',
