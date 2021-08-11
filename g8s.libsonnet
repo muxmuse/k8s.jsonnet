@@ -10,7 +10,7 @@
 // Docs, code, and releases: https://github.com/muxmuse/k8s.libsonnet
 //
 // author: mfa@ddunicorn.com
-// version: jsonnet -e '(import "./k8s.libsonnet").version'
+// version: since v0.6.0, the file contains all versions.
 // --------------------------------------------------------------------------
 // MIT License
 // 
@@ -68,6 +68,61 @@ local gitInput(name, url, revision) = {
     }]
   }
 };
+
+local v0_6_0 {
+  github:: {
+    interceptors:: function(branch, apiKeySecretName, apiKeySecretKey = 'SECRET', eventTypes = ['push']) [{
+      ref: {
+        name: 'github',
+        kind: 'ClusterInterceptor',
+        apiVersion: 'triggers.tekton.dev',
+      },
+      params: [{
+        name: 'secretRef',
+        value: {
+          secretName: apiKeySecretName,
+          secretKey: apiKeySecretKey
+        }
+      },{
+        name: "eventTypes",
+        value: eventTypes
+      }]
+    },{
+      ref: {
+        name: 'cel',
+        kind: 'ClusterInterceptor',
+        apiVersion: 'triggers.tekton.dev'
+      },
+      params: [{
+        name: 'filter',
+        # Restrict to branch
+        # https://tekton.dev/docs/triggers/eventlisteners/#cel-interceptors
+        value: "body.ref == 'refs/heads/%s'" % [branch],
+      }]
+    }],
+
+    bindings:: [{
+      name: 'gitrevision',
+      value: '$(body.after)'
+    }]
+  },
+
+  azurecr:: {
+    interceptors:: function(repo, tag) [{
+      ref: {
+        name: 'cel',
+        kind: 'ClusterInterceptor',
+        apiVersion: 'triggers.tekton.dev'
+      },
+      params: [{
+        name: 'filter',
+        # Restrict to specific repository
+        # https://tekton.dev/docs/triggers/eventlisteners/#cel-interceptors
+        value: "body.action == 'push' && (body.request.host + '/' + body.target.repository) == '%s' && body.target.tag == '%s'" % [repo, tag],
+      }]
+    }]
+  }
+}
 
 local github = {
   interceptors:: function(branch, apiKeySecretName, apiKeySecretKey = 'SECRET', eventTypes = ['push']) [{
@@ -408,18 +463,24 @@ local cronjob = function(namespace, name, el, schedule = '0 18 */1 * *', port = 
 };
 
 {
-  github:: github,
-  azurecr:: azurecr,
+  'v0.5.3': {
+    github:: github,
+    azurecr:: azurecr,
 
-  saTask:: saTask,
-  saEventListener:: saEventListener,
+    saTask:: saTask,
+    saEventListener:: saEventListener,
 
-  tasks:: tasks,
-  eventListener:: eventListener,
+    tasks:: tasks,
+    eventListener:: eventListener,
 
-  ingress:: ingress,
-  cronjob:: cronjob,
+    ingress:: ingress,
+    cronjob:: cronjob,
 
-  elServiceName:: elServiceName,
-  prefix:: prefix,
+    elServiceName:: elServiceName,
+    prefix:: prefix,
+  },
+  '0.6.0': $['v0.5.3'] + {
+    github:: v0_6_0.github,
+    azurecr:: v0_6_0.azurecr,    
+  }
 }
