@@ -296,7 +296,7 @@ local tasks = {
   build:: function (name, repoUrl, branch, imageRepo, regcredSecretName, serviceAccountName, kanikoCachePvcName = null, kanikoArgs = ['--cache=true']) { spec: { 
     # Template parameters definitions. Available in the whole template
     # with $(tt.params)
-    params: [],
+    params: [{ name: 'gitRevision', default: branch }],
     # Templates for {TaskRun, PiplineRun}s to create when triggered
     resourcetemplates: [{ 
       apiVersion: 'tekton.dev/v1beta1',
@@ -306,14 +306,14 @@ local tasks = {
         serviceAccountName: serviceAccountName, // k8s.nameFrom($.saCiCd),
         resources: { inputs: [ gitInput('source', repoUrl, branch) ] }, // '$(tt.params.gitrevision)'
         podTemplate: {
-          volumes: [{
-            name: 'dockerconfigjson',
-            secret: { secretName: regcredSecretName }
-          }]
-          +
-          if kanikoCachePvcName != null then [{ 
-            name: 'image-cache', persistentVolumeClaim: { claimName: kanikoCachePvcName }
-          }] else []
+            volumes: [{
+              name: 'dockerconfigjson',
+              secret: { secretName: regcredSecretName }
+            }]
+            +
+            if kanikoCachePvcName != null then [{ 
+              name: 'image-cache', persistentVolumeClaim: { claimName: kanikoCachePvcName }
+            }] else []
         },
         taskSpec: {
           resources: { inputs: [{ name: 'source', type: 'git' }] },
@@ -322,6 +322,7 @@ local tasks = {
             args: [
               '--context=$(inputs.resources.source.path)',
               '--destination=%s:%s' % [imageRepo, branch],
+              '--destination=%s:$(tt.params.gitRevision)' % [imageRepo],
               // '--use-new-run'
             ] + kanikoArgs,
             volumeMounts: [{ 
