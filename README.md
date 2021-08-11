@@ -12,6 +12,7 @@ wget https://raw.githubusercontent.com/muxmuse/k8s.libsonnet/0.5.2/k8s.libsonnet
 
 # Latest
 wget https://raw.githubusercontent.com/muxmuse/k8s.libsonnet/main/k8s.libsonnet
+wget https://raw.githubusercontent.com/muxmuse/k8s.libsonnet/main/g8s.libsonnet
 ```
 
 Then use it like so:
