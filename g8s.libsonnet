@@ -480,7 +480,7 @@ local cronjob = function(namespace, name, el, schedule = '0 18 */1 * *', port = 
     elServiceName:: elServiceName,
     prefix:: prefix,
   },
-  '0.6.0': $['v0.5.3'] + {
+  'v0.6.0': $['v0.5.3'] + {
     github:: v0_6_0.github,
     azurecr:: v0_6_0.azurecr,    
   }
