@@ -118,7 +118,7 @@ local v0_6_0 = {
         name: 'filter',
         # Restrict to specific repository
         # https://tekton.dev/docs/triggers/eventlisteners/#cel-interceptors
-        value: "body.action == 'push' && (body.request.host + '/' + body.target.repository) == '%s' && body.target.tag == '%s'" % [repo, tag],
+        value: "body.action == 'push' && (body.request.host + '/' + body.target.repository) == '%s'" % [repo] + if tag != null then " && body.target.tag == '%s'" % [tag] else "",
       }]
     }]
   }
@@ -490,7 +490,9 @@ local cronjob = function(namespace, name, el, schedule = '0 18 */1 * *', port = 
     elServiceName:: elServiceName,
     prefix:: prefix,
   },
-  'v0.6.0': $['v0.5.3'] + {
+  'v0.6.0': $['v0.6.1'],
+  'v0.6.1': $['v0.6.2'],
+  'v0.6.2': $['v0.5.3'] + {
     github:: v0_6_0.github,
     azurecr:: v0_6_0.azurecr,    
   }
