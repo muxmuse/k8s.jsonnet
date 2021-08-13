@@ -293,7 +293,17 @@ local saEventListener = function(namespace, name, clusterRoleName, readSecretNam
 };
 
 local tasks = {
-  build:: function (name, repoUrl, branch, imageRepo, regcredSecretName, serviceAccountName, kanikoCachePvcName = null, kanikoArgs = ['--cache=true']) { spec: { 
+  build:: function (
+    name,
+    repoUrl,
+    branch,
+    imageRepo,
+    regcredSecretName,
+    serviceAccountName,
+    kanikoCachePvcName = null,
+    kanikoArgs = ['--cache=true'],
+    resources = { requests: { memory: '4Gi' }, limits: { memory: '4Gi' } }
+  ) { spec: { 
     # Template parameters definitions. Available in the whole template
     # with $(tt.params)
     params: [{ name: 'gitRevision', default: branch }],
@@ -335,7 +345,7 @@ local tasks = {
               name: 'image-cache',
               mountPath: '/cache'
             }] else [],
-            resources: { requests: { memory: '4Gi' }, limits: { memory: '4Gi' } }
+            resources: resources
           }]
         }
       }
