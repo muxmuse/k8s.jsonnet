@@ -467,7 +467,7 @@ local cronjob = function(namespace, name, el, schedule = '0 18 */1 * *', port = 
         containers: [{
           name: 'wget',
           image: 'busybox',
-          args: ['wget', '--spider', '%s.%s.svc.cluster.local:%d' % [elServiceName(el), k8s.nameFrom(namespace), port] ]
+          args: ['wget', '--spider', '%s.%s.svc.cluster.local:%d' % [elServiceName(el), k8s.nameFrom(namespace), port], '--method', 'POST', '--body-data', '{}' ]
         }],
         restartPolicy: 'Never'
     } } } } }
@@ -492,7 +492,8 @@ local cronjob = function(namespace, name, el, schedule = '0 18 */1 * *', port = 
   },
   'v0.6.0': $['v0.6.1'],
   'v0.6.1': $['v0.6.2'],
-  'v0.6.2': $['v0.5.3'] + {
+  'v0.6.2': $['v0.6.3'],
+  'v0.6.3': $['v0.5.3'] + {
     github:: v0_6_0.github,
     azurecr:: v0_6_0.azurecr,    
   }
