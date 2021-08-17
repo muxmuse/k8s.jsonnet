@@ -473,6 +473,21 @@ local cronjob = function(namespace, name, el, schedule = '0 18 */1 * *', port = 
     } } } } }
 };
 
+local v0_6_5 = {
+  cronjob:: function(namespace, name, el, schedule = '0 18 */1 * *', port = 8080) k8s.r('batch/v1beta1', 'CronJob', namespace, name) + {
+    spec+: { 
+      schedule: schedule,
+      jobTemplate: { spec: { template: { spec: {
+        containers: [{
+          name: 'curl',
+          image: 'curlimages/curl',
+          args: ['curl', '-i', '-d', '"{}"', '-H', 'Content-type: application/json', '%s.%s.svc.cluster.local:%d' % [elServiceName(el), k8s.nameFrom(namespace), port]]
+        }],
+        restartPolicy: 'Never'
+    } } } } }
+  } 
+};
+
 {
   'v0.5.3': {
     github:: github,
@@ -497,5 +512,8 @@ local cronjob = function(namespace, name, el, schedule = '0 18 */1 * *', port = 
   'v0.6.4': $['v0.5.3'] + {
     github:: v0_6_0.github,
     azurecr:: v0_6_0.azurecr,    
+  },
+  'v0.6.5': $['v0.6.4'] + {
+    cronjob:: v0_6_5.cronjob
   }
 }
